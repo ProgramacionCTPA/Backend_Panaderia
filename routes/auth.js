@@ -20,11 +20,18 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: 'Credenciales invalidas' });
+    if (!user) return res.status(400).json({ msg: 'Usuario no encontrado' });
+
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: 'Credenciales invalidas' });
-    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin, name: user.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+    if (!isMatch) return res.status(400).json({ msg: 'Contraseña incorrecta' });
+
+    const payload = { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({ token, user: payload });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 module.exports = router;
