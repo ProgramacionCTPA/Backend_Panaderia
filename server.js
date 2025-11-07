@@ -10,22 +10,19 @@ const app = express();
 
 const allowedOrigins = ['https://panaderia-aserri.netlify.app'];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Permitir solicitudes sin Origin (como Postman o Render health checks)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No autorizado por CORS'));
-    }
-  },
+const corsOptions = {
+  origin: [
+    'https://panaderia-aserri.netlify.app',
+    'http://localhost:5500', // por si pruebas localmente
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-}));
-app.options('*', cors()); 
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
