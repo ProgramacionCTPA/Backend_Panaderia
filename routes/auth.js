@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -11,9 +12,10 @@ router.post('/register', async (req, res) => {
     const hash = await bcrypt.hash(password, salt);
     const user = new User({ name, email, password: hash });
     await user.save();
-    res.json({ msg: 'Usuario creado' });
+    res.json({ success: true, user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
