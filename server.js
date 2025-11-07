@@ -17,7 +17,10 @@ app.use(cors({
 }));
 app.options('*', cors()); // aceptar preflight
 
-app.use(express.json());
+// Permitir cuerpos JSON más grandes (por ejemplo imágenes base64)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 
 // 🔗 Rutas
 app.use('/api/auth', authRoutes);
